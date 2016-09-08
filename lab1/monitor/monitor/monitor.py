@@ -23,6 +23,7 @@ def parse_args():
     # working with users
     user_commands = subparsers.add_parser('user', help='working with users')
     user_commands.add_argument('--show', help='show registered users', action='store_true')
+    user_commands.add_argument('--register', help='register a new user', action='store_true')
     user_commands.set_defaults(func=modules.user.main)
     
     # system commands

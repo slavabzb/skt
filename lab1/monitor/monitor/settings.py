@@ -7,7 +7,7 @@ dirs = {
 
 # files which are used in the project
 files = {
-    'database': os.path.join(dirs['database'], 'database.json')
+    'database': os.path.join(dirs['database'], 'database.csv')
 }
 
 # make directories which do not exist
