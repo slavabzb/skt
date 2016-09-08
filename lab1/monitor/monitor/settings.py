@@ -1,22 +1,24 @@
 import os
 
-# directories which are used in the project
+# directories that are used in the project
 dirs = {
     'database': os.path.realpath(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'database'))
 }
 
-# files which are used in the project
+# files that are used in the project
 files = {
     'database': os.path.join(dirs['database'], 'database.csv')
 }
 
-# make directories which do not exist
+# make directories that do not exist
 for name, path in dirs.iteritems():
     if not os.path.isdir(path):
         os.makedirs(path)
 
-# create files which do not exist
+# create files that do not exist
 for name, path in files.iteritems():
     if not os.path.isfile(path):
-        with open(path, 'a'):
+        with open(path, 'ab') as f:
             os.utime(path, None)
+            if path == files['database']:
+                f.write('admin,123\n')
