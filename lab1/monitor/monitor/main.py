@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 
 from argparse import ArgumentParser
-from modules import system
+
+import modules
 
 def main(args):
     """Program entry point. The program starts here."""
     
-    sys = system(args)
-    sys.start_session()
+    modules.system.system(args).start_session()
 
 
 def parse_args():

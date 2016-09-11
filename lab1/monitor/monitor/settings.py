@@ -1,5 +1,8 @@
 import os
 
+__name__ = 'monitor'
+__version__ = '0.1.0'
+
 # directories that are used in the project
 dirs = {
     'database': os.path.realpath(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'database'))
