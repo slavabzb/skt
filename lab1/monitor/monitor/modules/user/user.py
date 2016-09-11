@@ -1,8 +1,6 @@
-import getpass
-import csv
-import settings
-
 class user():
+    """Represents a user."""
+    
     def __init__(self, **kwargs):
         """Constructor."""
         
@@ -20,17 +18,11 @@ class user():
             self._group = kwargs['group']
         
         if not (self._login and self._password and self._group):
-            raise Exception('Invalid user %(login)s %(password)s %(group)s' % {
+            raise Exception('Invalid user: login %(login)s, password %(password)s, group %(group)s' % {
                 'login': self._login,
                 'password': self._password,
                 'group': self._group
             })
-    
-    def __str__(self):
-        return str(self._login)
-
-    def __eq__(self, other):
-        return self._login == other._login and self._password == other._password
 
     def login(self):
         return self._login

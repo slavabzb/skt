@@ -7,8 +7,10 @@ import modules
 def main(args):
     """Program entry point. The program starts here."""
     
-    modules.system.system(args).start_session()
-
+    try:
+        modules.system.system(args).start_session()
+    except Exception as e:
+        print(e)
 
 def parse_args():
     """Parse command line arguments."""

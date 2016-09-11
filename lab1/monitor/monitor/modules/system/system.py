@@ -1,4 +1,5 @@
 import csv
+import getpass
 import functools
 import settings
 import modules
@@ -21,8 +22,7 @@ class system():
             'version': settings.__version__
         }
         
-        self._user = None #modules.user.user(group='guest', **vars(self._args))
-        self._user_logged = False
+        self._user = None
         self._user_list = []
         
         self._cmd = ''
@@ -30,7 +30,7 @@ class system():
             {
                 'names': ['help', 'h'],
                 'help': 'Print this help.',
-                'callback': functools.partial(system._print_help, self)
+                'callback': functools.partial(system._help_print, self)
             },
             {
                 'names': ['exit', 'quit', 'q'],
@@ -38,101 +38,47 @@ class system():
                 'callback': functools.partial(system.stop_session, self)
             },
             {
-                'names': ['user-show-list', 'usl'],
-                'help': 'Show all the registered users.',
-                'groups': ['admin'],
-                'callback': functools.partial(system._user_show_list, self)
+                'names': ['user-login', 'in'],
+                'help': 'Login into the system.',
+                'callback': functools.partial(system._user_login, self)
             },
             {
-                'names': ['user-register', 'ur'],
+                'names': ['user-logout', 'out'],
+                'help': 'Logout from the system.',
+                'groups': ['admin', 'user'],
+                'callback': functools.partial(system._user_logout, self)
+            },
+            {
+                'names': ['user-register', 'mku'],
                 'help': 'Add a new user to database.',
                 'groups': ['admin'],
                 'callback': functools.partial(system._user_register, self)
+            },
+            {
+                'names': ['user-remove', 'rmu'],
+                'help': 'Remove a new user from database.',
+                'groups': ['admin'],
+                'callback': functools.partial(system._user_remove, self)
+            },
+            {
+                'names': ['user-show-list', 'ls'],
+                'help': 'Show all the registered users.',
+                'groups': ['admin'],
+                'callback': functools.partial(system._user_show_list, self)
             }
         ]
         
         self._load_database(settings.files['database'])
-    
-    def _poll_command(self):
-        """Get next command."""
-                
-        prompt = '[%(user)s]> ' % {
-            'user': self._user  
-        }
         
-        self._cmd = raw_input(prompt)
-
-    def _process_command(self):
-        """Process current command."""
-        
-        try:
-            for cmd in self._cmds:
-                if self._cmd in cmd['names']:
-                    self._check_access(cmd)
-                    cmd['callback']()
-                    return
-        except Exception as e:
-            print(e)
-            return
-        
-        print('Unknown command \'%(command)s\'' % {
-            'command': self._cmd
-        })
-    
-    def _check_access(self, cmd):
-        """Check if user's group allowed for command."""
-        
-        if 'groups' in cmd:
-            if not self._user or self._user.group() not in cmd['groups']:
-                raise SystemError('Access denied')
-    
-    def _print_help(self):
-        """Print out available commands list."""
-        
-        for cmd in self._cmds:
-            print('\t%(name)-20s%(help)s' % {
-                'name': ', '.join(cmd['names']),
-                'help': cmd['help']
-            })
-    
-    def _user_show_list(self):
-        """Print out all the registered users."""
-        
-        for user in self._user_list:
-            print(user)
-    
-    def _user_register(self):
-        """Create a new account."""
-        
-        # get a new user info
-        login = raw_input('User login: ')
-        pass0 = getpass.getpass('User password: ')
-
-        if not pass0:
-            print('Empty password')
-            return
-
-        pass1 = getpass.getpass('Confirm user password: ')
-
-        if pass0 != pass1:
-            print('Password is not confirmed')
-            return
-        
-        group = raw_input('User group: ')
-        
-        self._user_list.append(modules.user.user(**{
-            'user': login,
-            'password': pass0,
-            'group': group
-        }))
-        
-        self._database_changed = True
+        if self._args.user and self._args.password:
+            self._user_login(self._args.user, self._args.password)
     
     def start_session(self):
         """Start system loop."""
         
-        self._running = True
         print(self._welcome)
+        
+        self._running = True
         while self._running:
             self._poll_command()
             self._process_command()
@@ -142,12 +88,8 @@ class system():
         
         self._running = False
         
-        # write to database
         if self._database_changed:
-            with open(settings.files['database'], 'ab') as databasefile:
-                writer = csv.writer(databasefile, quoting=csv.QUOTE_MINIMAL)
-                for user in self._user_list:
-                    writer.writerow([user.login(), user.password(), user.group()])
+            self._store_database(settings.files['database'])
 
     def _load_database(self, path):
         """Load a database."""
@@ -162,3 +104,125 @@ class system():
                     'password': row[1],
                     'group': row[2]
                 }))
+        
+        self._database_changed = False
+
+    def _store_database(self, path):
+        """Save database into a file."""
+        
+        with open(path, 'wb') as databasefile:
+            writer = csv.writer(databasefile, quoting=csv.QUOTE_MINIMAL)
+            for user in self._user_list:
+                writer.writerow([user.login(), user.password(), user.group()])
+        
+        self._database_changed = False
+    
+    def _poll_command(self):
+        """Get next command."""
+
+        prompt = '[%(user)s]> ' % {
+            'user': self._user.login() if self._user else self._user
+        }
+        
+        self._cmd = raw_input(prompt)
+
+    def _process_command(self):
+        """Process current command."""
+        
+        try:
+            if self._cmd:
+                for cmd in self._cmds:
+                    if self._cmd in cmd['names']:
+                        self._check_access(cmd)
+                        cmd['callback']()
+                        return
+                raise Exception('Unknown command \'%(command)s\'' % {
+                    'command': self._cmd
+                })
+        except Exception as e:
+            print(e)
+    
+    def _check_access(self, cmd):
+        """Check if user's group allowed for command."""
+        
+        if 'groups' in cmd:
+            if not self._user or self._user.group() not in cmd['groups']:
+                raise SystemError('Access denied')
+    
+    def _help_print(self):
+        """Print out available commands list."""
+        
+        for cmd in self._cmds:
+            print('\t%(name)-20s%(help)s' % {
+                'name': ', '.join(cmd['names']),
+                'help': cmd['help']
+            })
+    
+    def _user_show_list(self):
+        """Print out all the registered users."""
+        
+        for user in self._user_list:
+            print('\t%(user)s' % {
+                'user': user.login()
+            })
+    
+    def _user_get_login(self):
+        return raw_input('User login: ')
+    
+    def _user_get_password(self):
+        return getpass.getpass('User password: ')
+    
+    def _user_register(self):
+        """Create a new account."""
+        
+        login = _user_get_login()
+        password = self._user_get_password()
+
+        if password != getpass.getpass('Confirm user password: '):
+            print('Password is not confirmed')
+            return
+        
+        self._user_list.append(modules.user.user(**{
+            'user': login,
+            'password': password,
+            'group': raw_input('User group: ')
+        }))
+        
+        self._database_changed = True
+
+    def _user_remove(self):
+        """Remove a user from database."""
+        
+        login = self._user_get_login()
+        
+        for user in self._user_list:
+            if user.login() == login:
+                prompt = 'Remove user %(login)s [%(password)s] from group \'%(group)s\'? y/[N] ' % {
+                    'login': user.login(),
+                    'password': user.password(),
+                    'group': user.group()
+                }
+                if 'y' == raw_input(prompt).lower():
+                    self._user_list.remove(user)
+                    self._database_changed = True
+
+    def _user_login(self, login = None, password = None):
+        """Signin into the system."""
+        
+        if not login:
+            login = self._user_get_login()
+        
+        if not password:
+            password = self._user_get_password()
+        
+        for user in self._user_list:
+            if user.login() == login and user.password() == password:
+                self._user = modules.user.user(user=login, password=password, group=user.group())
+
+        if not self._user:
+            raise Exception('Invalid login/password')
+
+    def _user_logout(self):
+        """Logout from the system."""
+        
+        self._user = None
