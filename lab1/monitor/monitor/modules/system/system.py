@@ -1,5 +1,6 @@
 import csv
 import getpass
+import hashlib
 import functools
 import settings
 import modules
@@ -45,7 +46,6 @@ class system():
             {
                 'names': ['user-logout', 'out'],
                 'help': 'Logout from the system.',
-                'groups': ['admin', 'user'],
                 'callback': functools.partial(system._user_logout, self)
             },
             {
@@ -61,22 +61,30 @@ class system():
                 'callback': functools.partial(system._user_remove, self)
             },
             {
-                'names': ['user-show-list', 'ls'],
+                'names': ['user-change-password', 'chu'],
+                'help': 'Remove a new user from database.',
+                'groups': ['admin', 'user'],
+                'callback': functools.partial(system._user_change_password, self)
+            },
+            {
+                'names': ['user-show-list', 'lsu'],
                 'help': 'Show all the registered users.',
-                'groups': ['admin'],
+                'groups': ['admin', 'user'],
                 'callback': functools.partial(system._user_show_list, self)
             }
         ]
         
         self._load_database(settings.files['database'])
-        
-        if self._args.user and self._args.password:
-            self._user_login(self._args.user, self._args.password)
     
     def start_session(self):
         """Start system loop."""
+
+        if self._args.user and self._args.password:
+            self._user_login(self._args.user, self._args.password)
         
         print(self._welcome)
+        
+        self._check_no_users_condition()
         
         self._running = True
         while self._running:
@@ -117,6 +125,27 @@ class system():
         
         self._database_changed = False
     
+    def _check_no_users_condition(self):
+        if not self._user_list:
+            self._user_list.append(modules.user.user(**{
+                'user': settings.default_user['user'],
+                'password': self._user_get_hash(settings.default_user['user'], settings.default_user['password'], settings.default_user['group']),
+                'group': settings.default_user['group']
+            }))
+            
+            self._database_changed = True
+            
+            print("""
+                It seems to be a first starting of the system.
+                You can use login `%(login)s` and password `%(password)s`
+                to login into the system.
+                
+                Change your default credentials for security reasons!
+            """ % {
+                'login': settings.default_user['user'],
+                'password': settings.default_user['password']
+            })
+    
     def _poll_command(self):
         """Get next command."""
 
@@ -124,7 +153,7 @@ class system():
             'user': self._user.login() if self._user else self._user
         }
         
-        self._cmd = raw_input(prompt)
+        self._cmd = raw_input(prompt).strip()
 
     def _process_command(self):
         """Process current command."""
@@ -153,10 +182,39 @@ class system():
         """Print out available commands list."""
         
         for cmd in self._cmds:
-            print('\t%(name)-20s%(help)s' % {
+            print('\t%(name)-30s%(help)s' % {
                 'name': ', '.join(cmd['names']),
                 'help': cmd['help']
             })
+    
+    def _user_get_hash(self, login, password, group):
+        return hashlib.sha256(login + password + group).hexdigest()
+    
+    def _user_change_password(self):
+        oldpass = self._user_get_password('User current password: ')
+        userhash = self._user_get_hash(self._user.login(), oldpass, self._user.group())
+        
+        if self._user.password() != userhash:
+            self._user_logout()
+            raise Exception('Invalid password')
+        
+        newpass = self._user_get_password('Enter a new password: ')
+        
+        if not newpass:
+            raise Exception('Invalid password')
+        
+        self._user.set_password(self._user_get_hash(self._user.login(), newpass, self._user.group()))
+                
+        for user in self._user_list:
+            if user.login() == self._user.login() and user.password() == userhash and user.group() == self._user.group():
+                self._user_list.remove(user)
+                self._user_list.append(self._user)
+                break
+        
+        self._user_logout()
+        self._database_changed = True
+        
+        print('Password successfully changed. Signin into the system.')
     
     def _user_show_list(self):
         """Print out all the registered users."""
@@ -169,42 +227,58 @@ class system():
     def _user_get_login(self):
         return raw_input('User login: ')
     
-    def _user_get_password(self):
-        return getpass.getpass('User password: ')
+    def _user_get_password(self, prompt = 'User password: '):
+        return getpass.getpass(prompt)
     
     def _user_register(self):
         """Create a new account."""
         
-        login = _user_get_login()
+        login = self._user_get_login()
+        if not login:
+            raise Exception('Empty login')
+        
         password = self._user_get_password()
 
-        if password != getpass.getpass('Confirm user password: '):
-            print('Password is not confirmed')
-            return
+        if password != self._user_get_password('Confirm user password: '):
+            raise Exception('Password is not confirmed')
+        
+        group = raw_input('User group: ')
+        if not group:
+            raise Exception('Invalid group')
+        
+        for user in self._user_list:
+            userhash = self._user_get_hash(user.login(), password, user.group())
+            if login == user.login() and userhash == user.password() and group == user.group():
+                raise Exception('User already exists')
         
         self._user_list.append(modules.user.user(**{
             'user': login,
-            'password': password,
-            'group': raw_input('User group: ')
+            'password': self._user_get_hash(login, password, group),
+            'group': group
         }))
         
         self._database_changed = True
+
+    def _user_remove_confirm(self, user, login):
+        if user.login() != login:
+            return False
+
+        prompt = 'Remove user %(login)s from group \'%(group)s\'? y/[N] ' % {
+            'login': user.login(),
+            'group': user.group()
+        }
+
+        if 'y' == raw_input(prompt).strip().lower():
+            self._database_changed = True
+            return True
+        
+        return False
 
     def _user_remove(self):
         """Remove a user from database."""
         
         login = self._user_get_login()
-        
-        for user in self._user_list:
-            if user.login() == login:
-                prompt = 'Remove user %(login)s [%(password)s] from group \'%(group)s\'? y/[N] ' % {
-                    'login': user.login(),
-                    'password': user.password(),
-                    'group': user.group()
-                }
-                if 'y' == raw_input(prompt).lower():
-                    self._user_list.remove(user)
-                    self._database_changed = True
+        self._user_list = [user for user in self._user_list if not self._user_remove_confirm(user, login)]
 
     def _user_login(self, login = None, password = None):
         """Signin into the system."""
@@ -214,10 +288,13 @@ class system():
         
         if not password:
             password = self._user_get_password()
-        
+                
         for user in self._user_list:
-            if user.login() == login and user.password() == password:
-                self._user = modules.user.user(user=login, password=password, group=user.group())
+            if user.login() == login:
+                userhash = self._user_get_hash(user.login(), password, user.group())
+                if user.password() == userhash:
+                    self._user = modules.user.user(user=login, password=userhash, group=user.group())
+                    break
 
         if not self._user:
             raise Exception('Invalid login/password')

@@ -16,19 +16,15 @@ class user():
         
         if 'group' in kwargs:
             self._group = kwargs['group']
-        
-        if not (self._login and self._password and self._group):
-            raise Exception('Invalid user: login %(login)s, password %(password)s, group %(group)s' % {
-                'login': self._login,
-                'password': self._password,
-                'group': self._group
-            })
 
     def login(self):
         return self._login
-
+    
     def group(self):
         return self._group
     
     def password(self):
         return self._password
+    
+    def set_password(self, password):
+        self._password = password
