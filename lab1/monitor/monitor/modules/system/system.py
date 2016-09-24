@@ -174,9 +174,18 @@ class system():
     def _check_access(self, cmd):
         """Check if user's group allowed for command."""
         
+        reason = ''
+                
         if 'groups' in cmd:
             if not self._user or self._user.group() not in cmd['groups']:
-                raise SystemError('Access denied')
+                reason = """
+                    You don\'t have permission to execute a command.
+                    Please, try to log in with another account or
+                    contact your system administrator.
+                """
+        
+        if reason:
+            raise Exception('Access denied. {reason}'.format(reason=reason))
     
     def _help_print(self):
         """Print out available commands list."""
@@ -214,7 +223,7 @@ class system():
         self._user_logout()
         self._database_changed = True
         
-        print('Password successfully changed. Signin into the system.')
+        print('Password successfully changed. Log in into the system.')
     
     def _user_show_list(self):
         """Print out all the registered users."""
@@ -282,6 +291,9 @@ class system():
 
     def _user_login(self, login = None, password = None):
         """Signin into the system."""
+        
+        if self._user:
+            raise Exception('Please logout first')
         
         if not login:
             login = self._user_get_login()
