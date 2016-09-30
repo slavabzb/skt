@@ -14,5 +14,13 @@ except ImportError:
 
 def parse_config(fp):
 	tree = etree.parse(fp)
+	#print etree.tostring(tree.getroot(), pretty_print=True)
+	root = tree.getroot()
+
+	#r = root.find('xi:include', root.nsmap)
+	#print r
+
+	#tree.xinclude()
 	tree.xinclude()
-	return tree.getroot()
+	
+	return root

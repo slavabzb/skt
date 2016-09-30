@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <logger>
 	<sink>
-		<filename>@LOG_DIR/stockviewer.log</filename>
+		<filename>@LOG/stockviewer.log</filename>
 		<level>DEBUG</level>
 		<format>%(asctime)s [%(levelname)s] %(message)s</format>
 		<dateformat>%d-%m-%Y %H:%M:%S</dateformat>
