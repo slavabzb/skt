@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<provider name="sqlite">
+	<file>@DATABASE</file>
+</provider>
+

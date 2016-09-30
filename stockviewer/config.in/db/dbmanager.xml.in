@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
-<dbmanager>
-	<provider_factory>
-		<empty />
-	</provider_factory>
+<dbmanager xmlns:xi="http://www.w3.org/2001/XInclude">
+	<dbprovider>sqlite</dbprovider>
+	<xi:include href="@CONFIG/db/provider/factory.xml"/>
 </dbmanager>
 

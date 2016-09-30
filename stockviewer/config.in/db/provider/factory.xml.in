@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<provider_factory xmlns:xi="http://www.w3.org/2001/XInclude">
+	<providers>
+		<xi:include href="@CONFIG/db/provider/sqlite.xml"/>
+	</providers>
+</provider_factory>
+

@@ -23,11 +23,14 @@ class service():
 		logging.info('Service started')
 
 		if self.__args.make_migration:
-			for dirpath, dirnames, filenames in os.walk(settings.dirs['migration']):
-				for dirname in sorted(dirnames):
-					for filename in sorted(os.listdir(os.path.join(dirpath, dirname))):
-						with open(os.path.join(dirpath, dirname, filename), 'rb') as f:
-							self.__dbmanager.apply(f)
+			self.__make_migration()
 
 	def stop(self):
 		logging.info('Service stopped')
+
+	def __make_migration(self):
+		for dirpath, dirnames, filenames in os.walk(settings.dirs['migration']):
+			for dirname in sorted(dirnames):
+				for filename in sorted(os.listdir(os.path.join(dirpath, dirname))):
+					with open(os.path.join(dirpath, dirname, filename), 'rb') as f:
+						self.__dbmanager.apply(f)
