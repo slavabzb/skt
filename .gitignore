@@ -93,4 +93,5 @@ lab1/monitor/database/
 
 # stockviewer
 stockviewer/config/
+stockviewer/private/
 

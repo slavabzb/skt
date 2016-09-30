@@ -1,16 +1,7 @@
 import settings
 
-from argparse import ArgumentParser
-
-from utils import parse_config
-from utils import loginit
-
 from service import service
-
-def parse_args():
-	parser = ArgumentParser()
-
-	return parser.parse_args()
+from utils import parse_args, parse_config, loginit
 
 def main(args, config):
 	loginit(config.find('logger'))
@@ -19,4 +10,4 @@ def main(args, config):
 		s.start()
 
 if __name__ == '__main__':
-    main(parse_args(), parse_config(settings.files['config']))
+	main(parse_args(), parse_config(settings.files['config']))

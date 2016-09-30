@@ -14,4 +14,5 @@ except ImportError:
 
 def parse_config(fp):
 	tree = etree.parse(fp)
+	tree.xinclude()
 	return tree.getroot()

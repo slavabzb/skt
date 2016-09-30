@@ -10,6 +10,8 @@ class service():
 
 	def __exit__(self, type, value, traceback):
 		self.stop()
+		if value:
+			logging.exception(value)
 		return self
 
 	def start(self):
