@@ -8,7 +8,6 @@
 	</sink>
 	<sink>
 		<level>ERROR</level>
-		<format>%(asctime)s [%(levelname)s] %(message)s</format>
-		<dateformat>%d-%m-%Y %H:%M:%S</dateformat>
+		<format>%(message)s</format>
 	</sink>
 </logger>

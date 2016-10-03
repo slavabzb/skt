@@ -10,7 +10,6 @@ class dbmanager():
 		self.__provider = factory.create_provider(self.__config.find('provider').text)
 
 	def apply(self, sql_script):
-		logging.info("Executing sql script\n{}".format(sql_script))
 		try:
 			self.__provider.apply(sql_script)
 		except Exception as e:
