@@ -1,5 +1,5 @@
 create table STOCK(
-	`stock_id` integer,
+	`stock_id` integer primary key,
 	`name` text not null,
-	primary key (`stock_id`, `name`)
+	unique (`stock_id`, `name`)
 );

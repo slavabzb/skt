@@ -11,6 +11,28 @@ class dbmanager():
 		factory = provider_factory(self.__config.find('provider_factory'))		
 		self.__provider = factory.create_provider(self.__config.find('provider').text)
 
+	def get_stock_info(self, symbol, begin = None, end = None):
+		stock_info = []
+
+		try:
+			query = """
+				select
+					st.name,
+					std.date,
+					std.open,
+					std.high,
+					std.low,
+					std.close,
+					std.volume
+				from STOCK st join STOCK_DATA std using(stock_id)
+			"""
+			c = self.__provider.execute(query)
+			stock_info = c.fetchall()
+		except Exception as e:
+			logging.warning(e)
+
+		return stock_info
+
 	def make_migration(self):
 		current_version = 0
 
@@ -20,12 +42,12 @@ class dbmanager():
 			current_version = int(res[0])
 			dirty = int(res[1])
 			if dirty:
-				logging.error('Migration {} is broken. Please, fix it manually. Aborting.'.format(current_version))
+				logging.error('Migration `{}` is broken. Please, fix it manually. Aborting.'.format(current_version))
 				return
 		except:
 			pass
 
-		logging.info('Current database version is {}'.format(current_version))
+		logging.info('Current database version is `{}`'.format(current_version))
 
 		for dirpath, dirnames, filenames in os.walk(settings.dirs['migration']):
 			for new_version in sorted(dirnames):

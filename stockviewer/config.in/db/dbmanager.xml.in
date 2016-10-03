@@ -3,4 +3,3 @@
 	<provider>sqlite</provider>
 	<xi:include href="@CONFIG/db/provider/factory.xml"/>
 </dbmanager>
-

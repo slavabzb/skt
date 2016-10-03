@@ -1,2 +1,5 @@
+from view import viewmanager
+
 def main(args, config):
-	print 'hello view'
+	vm = viewmanager(config.find('viewmanager'))
+	vm.view(args.symbol, args.begin, args.end)

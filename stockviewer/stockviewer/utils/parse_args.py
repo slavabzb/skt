@@ -14,8 +14,8 @@ def parse_args():
 
 	view_parser = subparsers.add_parser('view', help='stock view commands')
 	view_parser.add_argument('symbol', help='stock symbol')
-	view_parser.add_argument('start_date', help='begin of the period')
-	view_parser.add_argument('end_date', help='end of the period')
+	view_parser.add_argument('begin', help='begin of the period')
+	view_parser.add_argument('end', help='end of the period')
 	view_parser.set_defaults(func=viewmain)
 
 	return parser.parse_args()
