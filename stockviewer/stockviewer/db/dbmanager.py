@@ -15,18 +15,30 @@ class dbmanager():
 		stock_info = []
 
 		try:
-			query = """
-				select
-					st.name,
-					std.date,
-					std.open,
-					std.high,
-					std.low,
-					std.close,
-					std.volume
-				from STOCK st join STOCK_DATA std using(stock_id)
-			"""
-			c = self.__provider.execute(query)
+			query = (
+				"select "
+					"s.name,"
+					"st.date,"
+					"st.open,"
+					"st.high,"
+					"st.low,"
+					"st.close,"
+					"st.volume"
+				" from "
+					"STOCK s join STOCK_DATA st using(stock_id)"
+				" where "
+					"s.name = '{symbol}'"
+			)
+
+			if begin:
+				query = query + " and st.date >= '{begin}'"
+
+			if end:
+				query = query + " and st.date < '{end}'"
+
+			query = query + " order by st.date"
+
+			c = self.__provider.execute(query, symbol=symbol, begin=begin, end=end)
 			stock_info = c.fetchall()
 		except Exception as e:
 			logging.warning(e)

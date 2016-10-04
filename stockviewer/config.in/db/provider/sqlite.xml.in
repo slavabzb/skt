@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <provider name="sqlite">
 	<file>@DATABASE</file>
+	<dateformat>%d-%m-%Y</dateformat>
 </provider>
 
