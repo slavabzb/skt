@@ -5,3 +5,5 @@ def main(args, config):
 
 	if args.make_migration:
 		db.make_migration()
+
+	db.close()

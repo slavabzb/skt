@@ -6,18 +6,25 @@ from provider import provider_factory
 
 class dbmanager():
 	def __init__(self, config):
+		logging.debug('Db manager init: config {}'.format(config))
 		self.__config = config
 		
-		factory = provider_factory(self.__config.find('provider_factory'))		
+		factory = provider_factory(self.__config.find('provider_factory'))
+		
 		self.__provider = factory.create_provider(self.__config.find('provider').text)
+		self.__provider.connect()
+
+	def close(self):
+		logging.debug('Db manager close')
+		self.__provider.close()
 
 	def get_stock_info(self, symbol, begin = None, end = None):
+		logging.debug('Db manager get stock info: symbol `{symbol}`, begin `{begin}`, end `{end}`'.format(symbol=symbol, begin=begin, end=end))
 		stock_info = []
 
 		try:
 			query = (
 				"select "
-					"s.name,"
 					"st.date,"
 					"st.open,"
 					"st.high,"
@@ -38,14 +45,14 @@ class dbmanager():
 
 			query = query + " order by st.date"
 
-			c = self.__provider.execute(query, symbol=symbol, begin=begin, end=end)
-			stock_info = c.fetchall()
+			stock_info = self.__provider.execute(query, symbol=symbol, begin=begin, end=end, sqlitedatefmtids=[0])
 		except Exception as e:
 			logging.warning(e)
 
 		return stock_info
 
 	def make_migration(self):
+		logging.debug('Db manager make migration')
 		current_version = 0
 
 		try:
@@ -59,7 +66,7 @@ class dbmanager():
 		except:
 			pass
 
-		logging.info('Current database version is `{}`'.format(current_version))
+		logging.debug('Current database version is `{}`'.format(current_version))
 
 		for dirpath, dirnames, filenames in os.walk(settings.dirs['migration']):
 			for new_version in sorted(dirnames):
@@ -82,13 +89,13 @@ class dbmanager():
 					if new_version >= current_version:
 						for filename in sorted(os.listdir(os.path.join(dirpath, new_version))):
 							if (unicode(filename),) in files:
-								logging.info('Skipping file `{}`'.format(filename))
+								logging.debug('Skipping file `{}`'.format(filename))
 							else:
-								logging.info('Applying file `{}`'.format(filename))
+								logging.debug('Applying file `{}`'.format(filename))
 								with open(os.path.join(dirpath, new_version, filename), 'rb') as f:
 									self.__provider.apply(f.read())
-									self.__provider.execute('insert into MIGRATION_FILES values (\'{}\')'.format(filename))
-						self.__provider.execute('update MIGRATION_VERSION set `version` = {}'.format(int(new_version)))
+									self.__provider.execute("insert into MIGRATION_FILES values ('{filename}')", filename=filename)
+						self.__provider.execute('update MIGRATION_VERSION set `version` = {version}', version=int(new_version))
 				except Exception as e:
 					self.__provider.execute('update MIGRATION_VERSION set `dirty` = 1')
 					raise e

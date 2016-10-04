@@ -1,5 +1,12 @@
 <?xml version="1.0"?>
 <viewmanager xmlns:xi="http://www.w3.org/2001/XInclude">
-	<date_format>%d-%m-%Y</date_format>
+	<date_input_format>%d-%m-%Y</date_input_format>
+	<date_view_format>%d/%b/%Y</date_view_format>
+	<date_step>
+		<days>1</days>
+	</date_step>
+	<date_default_window>
+		<days>365</days>
+	</date_default_window>
 	<xi:include href="@CONFIG/db/dbmanager.xml"/>
 </viewmanager>

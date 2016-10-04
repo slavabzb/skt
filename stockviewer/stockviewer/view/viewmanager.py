@@ -1,25 +1,93 @@
-from time import strptime, strftime
+import logging
+
+from collections import namedtuple
+from time import strptime, strftime, localtime, struct_time, mktime, time
+from datetime import date, timedelta
 from db import dbmanager
 
 class viewmanager():
 	def __init__(self, config):
+		logging.debug('View manager init: config {}'.format(config))
 		self.__config = config
 		self.__db = dbmanager(self.__config.find('dbmanager'))
+		self.__date_input_format = self.__config.find('date_input_format').text
+		self.__date_view_format = self.__config.find('date_view_format').text
+
+	def close(self):
+		logging.debug('View manager close')
+		self.__db.close()
 
 	def view(self, symbol, begin = None, end = None):
-		date_format = self.__config.find('date_format').text
+		logging.debug('View manager view: symbol `{symbol}`, begin `{begin}`, end `{end}`'.format(symbol=symbol, begin=begin, end=end))
 
 		try:
 			if begin:
-				begin = strptime(begin, date_format)
+				begin = strptime(begin, self.__date_input_format)
 
 			if end:
-				end = strptime(end, date_format)
+				end = strptime(end, self.__date_input_format)
 		except ValueError:
-			raise Exception('Dates don\'t match the format `{}`'.format(date_format))
-
-		if begin and end and end <= begin:
-			raise Exception('The end `{}` of the period is greater or equal to begin `{}`'.format(strftime(date_format, end), strftime(date_format, begin)))
+			raise Exception("Dates don't match the format `{}`".format(self.__date_input_format))
 
 		stock_info = self.__db.get_stock_info(symbol, begin, end)
-		print stock_info
+
+		mindate = None
+		maxdate = None
+
+		dbegin = begin
+		if dbegin:
+			if stock_info:
+				mindate = stock_info[0][0]
+		else:
+			if stock_info:
+				dbegin = stock_info[0][0]
+				mindate = dbegin
+			else:
+				dbegin = localtime()
+
+		logging.debug('View period begin {}'.format(strftime(self.__date_input_format, dbegin)))
+
+		dend = end
+		if dend:
+			if stock_info:
+				maxdate = stock_info[-1][0]
+		else:
+			if stock_info:
+				dend = stock_info[-1][0]
+				maxdate = dend
+			else:
+				dend = date.today() + self.__make_timedelta('date_default_window')
+				dend = dend.timetuple()
+
+		if dend <= dbegin:
+			raise Exception('The end `{}` of the period is less or equal to begin `{}`'.format(strftime(self.__date_view_format, dend), strftime(self.__date_view_format, dbegin)))
+
+		logging.debug('View period end {}'.format(strftime(self.__date_input_format, dend)))
+
+		if mindate and maxdate:
+			logging.debug('Matching period is [{}; {}]'.format(strftime(self.__date_input_format, mindate), strftime(self.__date_input_format, maxdate)))
+
+		print mindate, maxdate
+
+		itime = dbegin
+		timestep = self.__make_timedelta('date_step')
+		while itime <= dend:
+			if stock_info:
+				if itime >= mindate and itime <= maxdate:
+					print strftime(self.__date_view_format, itime), 'match'
+				else:
+					print strftime(self.__date_view_format, itime), 'miss'
+
+			step = date.fromtimestamp(mktime(itime)) + timestep
+			itime = step.timetuple()
+
+		for row in stock_info:
+			print strftime(self.__date_view_format, row[0]), row[1:]
+
+	def __make_timedelta(self, path):
+		delta = {}
+
+		for node in self.__config.find(path):
+			delta.update({node.tag: int(node.text)})
+
+		return timedelta(**delta)

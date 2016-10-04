@@ -1,23 +1,53 @@
 import sqlite3
 import logging
-import time
+
+from time import struct_time, strftime, strptime
 
 class sqlite_provider():
 	def __init__(self, config):
+		logging.debug('Sqlite provider init: config {}'.format(config))
 		self.__config = config
-		self.__file = self.__config.find('file').text
+		self.__filename =  self.__config.find('file').text
+		self.__datefmt = self.__config.find('dateformat').text
 
-	def apply(self, sql_script):
-		with sqlite3.connect(self.__file) as cnx:
-			cnx.executescript(sql_script)
+	def connect(self):
+		logging.debug('Connecting to `{}`'.format(self.__filename))
+		self.__cnx = sqlite3.connect(self.__filename)
 
-	def execute(self, query, **kw):		
-		for k in kw:
-			if type(kw[k]) == time.struct_time:
-				kw[k] = time.strftime(self.__config.find('dateformat').text, kw[k])
+	def close(self):
+		logging.debug('Closing connection to `{}`'.format(self.__filename))
+		self.__cnx.close()
 
-		query = query.format(**kw)
-		logging.info(query)
+	def apply(self, script):
+		try:
+			logging.info('Executing script\n{}'.format(script))
+			self.__cnx.executescript(script)
+		except Exception as e:
+			logging.warning(e)
 
-		with sqlite3.connect(self.__file) as cnx:
-			return cnx.cursor().execute(query)
+	def execute(self, query, **kw):
+		res = []
+
+		try:
+			for k in kw:
+				if type(kw[k]) == struct_time:
+					kw[k] = strftime(self.__datefmt, kw[k])
+
+			query = query.format(**kw)
+			logging.info(query)
+
+			for row in self.__cnx.execute(query):
+				data = []
+
+				for idx, el in enumerate(row):
+					if 'sqlitedatefmtids' in kw and idx in kw['sqlitedatefmtids']:
+						data.append(strptime(row[idx], self.__datefmt))
+					else:
+						data.append(row[idx])
+
+				res.append(data)
+
+		except Exception as e:
+			logging.warning(e)
+
+		return res

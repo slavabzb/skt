@@ -9,9 +9,8 @@ class provider_factory():
 	def create_provider(self, requested_name):
 		for provider_node in self.__config.find('providers'):
 			if requested_name == provider_node.get('name'):
-				logging.info('Creating sqlite provider')
 				return sqlite_provider(provider_node)
 
-		logging.warning('Provider "{}" not found'.format(requested_name))
+		logging.warning("No '{}' provider found".format(requested_name))
 		
 		return None
