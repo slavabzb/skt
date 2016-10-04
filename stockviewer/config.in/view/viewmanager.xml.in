@@ -5,8 +5,9 @@
 	<date_step>
 		<days>1</days>
 	</date_step>
-	<date_default_window>
+	<default_view_window>
 		<days>365</days>
-	</date_default_window>
+	</default_view_window>
 	<xi:include href="@CONFIG/db/dbmanager.xml"/>
+	<xi:include href="@CONFIG/getter/getter.xml"/>
 </viewmanager>

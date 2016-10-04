@@ -8,7 +8,7 @@ def main(args, config):
 		loginit(config.find('logger'))
 		args.func(args, config)
 	except Exception as e:
-		logging.critical(e)
+		logging.exception(e)
 
 if __name__ == '__main__':
 	main(parse_args(), parse_config(settings.files['config']))

@@ -1,13 +1,6 @@
 <?xml version="1.0"?>
 <dbmanager xmlns:xi="http://www.w3.org/2001/XInclude">
 	<provider>sqlite</provider>
-	<fields>
-		<field alias="date">Date</field>
-		<field alias="open">Open</field>
-		<field alias="high">High</field>
-		<field alias="low">Low</field>
-		<field alias="close">Close</field>
-		<field alias="volume">Volume</field>
-	</fields>
+	<xi:include href="@CONFIG/parts/fields.xml"/>
 	<xi:include href="@CONFIG/db/provider/factory.xml"/>
 </dbmanager>

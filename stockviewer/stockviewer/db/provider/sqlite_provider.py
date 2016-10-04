@@ -1,7 +1,7 @@
 import sqlite3
 import logging
 
-from time import struct_time, strftime, strptime
+from datetime import datetime
 
 class sqlite_provider():
 	def __init__(self, config):
@@ -30,8 +30,8 @@ class sqlite_provider():
 
 		try:
 			for k in kw:
-				if type(kw[k]) == struct_time:
-					kw[k] = strftime(self.__datefmt, kw[k])
+				if type(kw[k]) == datetime:
+					kw[k] = datetime.strftime(kw[k], self.__datefmt)
 
 			query = query.format(**kw)
 			logging.info(query)
@@ -41,7 +41,7 @@ class sqlite_provider():
 
 				for idx, el in enumerate(row):
 					if 'sqlitedatefmtids' in kw and idx in kw['sqlitedatefmtids']:
-						data.append(strptime(row[idx], self.__datefmt))
+						data.append(datetime.strptime(row[idx], self.__datefmt))
 					else:
 						data.append(row[idx])
 
