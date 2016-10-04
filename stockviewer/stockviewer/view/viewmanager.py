@@ -37,10 +37,10 @@ class viewmanager():
 		dbegin = begin
 		if dbegin:
 			if stock_info:
-				mindate = stock_info[0][0]
+				mindate = stock_info[0]['Date']
 		else:
 			if stock_info:
-				dbegin = stock_info[0][0]
+				dbegin = stock_info[0]['Date']
 				mindate = dbegin
 			else:
 				dbegin = localtime()
@@ -50,10 +50,10 @@ class viewmanager():
 		dend = end
 		if dend:
 			if stock_info:
-				maxdate = stock_info[-1][0]
+				maxdate = stock_info[-1]['Date']
 		else:
 			if stock_info:
-				dend = stock_info[-1][0]
+				dend = stock_info[-1]['Date']
 				maxdate = dend
 			else:
 				dend = date.today() + self.__make_timedelta('date_default_window')
@@ -66,23 +66,29 @@ class viewmanager():
 
 		if mindate and maxdate:
 			logging.debug('Matching period is [{}; {}]'.format(strftime(self.__date_input_format, mindate), strftime(self.__date_input_format, maxdate)))
+		else:
+			logging.debug('No matching period found')
 
-		print mindate, maxdate
+		missed = []
 
 		itime = dbegin
 		timestep = self.__make_timedelta('date_step')
 		while itime <= dend:
 			if stock_info:
-				if itime >= mindate and itime <= maxdate:
-					print strftime(self.__date_view_format, itime), 'match'
-				else:
-					print strftime(self.__date_view_format, itime), 'miss'
+				if not (itime >= mindate and itime <= maxdate):
+					missed.append(itime)
+			else:
+				missed.append(itime)
 
 			step = date.fromtimestamp(mktime(itime)) + timestep
 			itime = step.timetuple()
 
+		print 'Missed'
+		for tmp in missed:
+			print tmp
+
 		for row in stock_info:
-			print strftime(self.__date_view_format, row[0]), row[1:]
+			print strftime(self.__date_view_format, row['Date']), row
 
 	def __make_timedelta(self, path):
 		delta = {}
