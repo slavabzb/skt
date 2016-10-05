@@ -22,6 +22,25 @@ class sqlite_provider():
 	def apply(self, fp):
 		self.__cnx.executescript(fp.read())
 
-	def execute(self, query):
+	def execute(self, query, **kw):
+		for k in kw:
+			if type(kw[k]) == datetime:
+				kw[k] = datetime.strftime(kw[k], self.__datefmt)
+
+		query = query.format(**kw)
 		logging.info(query)
-		return self.__cnx.execute(query)
+
+		res = []
+
+		for row in self.__cnx.execute(query):
+			data = []
+
+			for idx, el in enumerate(row):
+				if 'sqlitedatefmtids' in kw and idx in kw['sqlitedatefmtids']:
+					data.append(datetime.strptime(row[idx], self.__datefmt))
+				else:
+					data.append(row[idx])
+
+			res.append(data)
+
+		return res

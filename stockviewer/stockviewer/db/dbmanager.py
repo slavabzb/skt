@@ -18,10 +18,9 @@ class dbmanager():
 		current_version = 0
 
 		try:
-			cur = self.__provider.execute('select version, dirty from MIGRATION_VERSION')
-			res = cur.fetchone()
-			current_version = int(res[0])
-			dirty = int(res[1])
+			res = self.__provider.execute('select version, dirty from MIGRATION_VERSION')
+			current_version = int(res[0][0])
+			dirty = int(res[0][1])
 			if dirty:
 				logging.error('Migration `{}` is broken. Please, fix it manually. Aborting.'.format(current_version))
 				return
@@ -36,8 +35,7 @@ class dbmanager():
 
 				try:
 					if int(new_version) == current_version:
-						cur = self.__provider.execute('select * from MIGRATION_FILES')
-						files = cur.fetchall()
+						files = self.__provider.execute('select * from MIGRATION_FILES')
 					elif int(new_version) > current_version:
 						self.__provider.execute('delete from MIGRATION_FILES')
 				except:
@@ -46,7 +44,7 @@ class dbmanager():
 				try:
 					if new_version >= current_version:
 						for filename in sorted(os.listdir(os.path.join(dirpath, new_version))):
-							if (unicode(filename),) in files:
+							if [unicode(filename)] in files:
 								logging.debug('Skipping file `{}`'.format(filename))
 							else:
 								logging.debug('Applying file `{}`'.format(filename))

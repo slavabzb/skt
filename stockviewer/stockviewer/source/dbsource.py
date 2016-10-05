@@ -39,14 +39,11 @@ class dbsource():
 
 		query = query + " order by st.date"
 
-		query = query.format(symbol=symbol, begin=begin, end=end)
-
 		res = []
 
 		try:
 			self.__provider.connect()
-			cur = self.__provider.execute(query)
-			res = cur.fetchall()
+			res = self.__provider.execute(query, symbol=symbol, begin=begin, end=end, sqlitedatefmtids=[0])
 			self.__provider.close()
 		except Exception as e:
 			logging.warning(e)
