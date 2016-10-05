@@ -18,8 +18,8 @@ class dbmanager():
 		current_version = 0
 
 		try:
-			c = self.__provider.execute('select version, dirty from MIGRATION_VERSION')
-			res = c.fetchone()
+			cur = self.__provider.execute('select version, dirty from MIGRATION_VERSION')
+			res = cur.fetchone()
 			current_version = int(res[0])
 			dirty = int(res[1])
 			if dirty:
@@ -34,18 +34,14 @@ class dbmanager():
 			for new_version in sorted(dirnames):
 				files = []
 
-				if int(new_version) == current_version:
-					try:
-						c = self.__provider.execute('select * from MIGRATION_FILES')
-						files = c.fetchall()
-					except:
-						pass
-
-				if int(new_version) > current_version:
-					try:
+				try:
+					if int(new_version) == current_version:
+						cur = self.__provider.execute('select * from MIGRATION_FILES')
+						files = cur.fetchall()
+					elif int(new_version) > current_version:
 						self.__provider.execute('delete from MIGRATION_FILES')
-					except:
-						pass
+				except:
+					pass
 
 				try:
 					if new_version >= current_version:
@@ -55,9 +51,9 @@ class dbmanager():
 							else:
 								logging.debug('Applying file `{}`'.format(filename))
 								with open(os.path.join(dirpath, new_version, filename), 'rb') as f:
-									self.__provider.apply(f.read())
-									self.__provider.execute("insert into MIGRATION_FILES values ('{filename}')", filename=filename)
-						self.__provider.execute('update MIGRATION_VERSION set `version` = {version}', version=int(new_version))
+									self.__provider.apply(f)
+								self.__provider.execute("insert into MIGRATION_FILES values ('{}')".format(filename))
+						self.__provider.execute('update MIGRATION_VERSION set `version` = {}'.format(int(new_version)))
 				except Exception as e:
 					self.__provider.execute('update MIGRATION_VERSION set `dirty` = 1')
 					raise e

@@ -16,33 +16,38 @@ class dbsource():
 
 	def get(self, symbol, begin = None, end = None):
 		logging.debug('Database source get: symbol `{symbol}`, begin `{begin}`, end `{end}`'.format(symbol=symbol, begin=begin, end=end))
-		self.__provider.connect()
+
+		query = (
+			"select "
+				"st.date,"
+				"st.open,"
+				"st.high,"
+				"st.low,"
+				"st.close,"
+				"st.volume"
+			" from "
+				"STOCK s join STOCK_DATA st using(stock_id)"
+			" where "
+				"s.name = '{symbol}'"
+		)
+
+		if begin:
+			query = query + " and st.date >= '{begin}'"
+
+		if end:
+			query = query + " and st.date <= '{end}'"
+
+		query = query + " order by st.date"
+
+		query = query.format(symbol=symbol, begin=begin, end=end)
+
 		res = []
 
 		try:
-			query = (
-				"select "
-					"st.date,"
-					"st.open,"
-					"st.high,"
-					"st.low,"
-					"st.close,"
-					"st.volume"
-				" from "
-					"STOCK s join STOCK_DATA st using(stock_id)"
-				" where "
-					"s.name = '{symbol}'"
-			)
-
-			if begin:
-				query = query + " and st.date >= '{begin}'"
-
-			if end:
-				query = query + " and st.date <= '{end}'"
-
-			query = query + " order by st.date"
-
-			res = self.__provider.execute(query, symbol=symbol, begin=begin, end=end, sqlitedatefmtids=[0])
+			self.__provider.connect()
+			cur = self.__provider.execute(query)
+			res = cur.fetchall()
+			self.__provider.close()
 		except Exception as e:
 			logging.warning(e)
 
@@ -59,7 +64,5 @@ class dbsource():
 			}
 
 			stock_info.append(info)
-
-		self.__provider.close()
 
 		return stock_info

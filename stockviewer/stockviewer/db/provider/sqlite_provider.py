@@ -16,38 +16,12 @@ class sqlite_provider():
 
 	def close(self):
 		logging.debug('Closing connection to `{}`'.format(self.__filename))
+		self.__cnx.commit()
 		self.__cnx.close()
 
-	def apply(self, script):
-		try:
-			logging.info('Executing script\n{}'.format(script))
-			self.__cnx.executescript(script)
-		except Exception as e:
-			logging.warning(e)
+	def apply(self, fp):
+		self.__cnx.executescript(fp.read())
 
-	def execute(self, query, **kw):
-		res = []
-
-		try:
-			for k in kw:
-				if type(kw[k]) == datetime:
-					kw[k] = datetime.strftime(kw[k], self.__datefmt)
-
-			query = query.format(**kw)
-			logging.info(query)
-
-			for row in self.__cnx.execute(query):
-				data = []
-
-				for idx, el in enumerate(row):
-					if 'sqlitedatefmtids' in kw and idx in kw['sqlitedatefmtids']:
-						data.append(datetime.strptime(row[idx], self.__datefmt))
-					else:
-						data.append(row[idx])
-
-				res.append(data)
-
-		except Exception as e:
-			logging.warning(e)
-
-		return res
+	def execute(self, query):
+		logging.info(query)
+		return self.__cnx.execute(query)
