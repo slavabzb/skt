@@ -1,7 +1,0 @@
-<?xml version="1.0"?>
-<getter xmlns:xi="http://www.w3.org/2001/XInclude">
-	<getters>
-		<getter>urlgetter</getter>
-	</getters>
-	<xi:include href="@CONFIG/getter/factory.xml"/>
-</getter>

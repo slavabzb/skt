@@ -1,4 +1,4 @@
 <?xml version="1.0"?>
-<getter_factory xmlns:xi="http://www.w3.org/2001/XInclude">
-	<xi:include href="@CONFIG/getter/urlgetter.xml"/>
-</getter_factory>
+<source_factory xmlns:xi="http://www.w3.org/2001/XInclude">
+	<xi:include href="@CONFIG/source/urlsource.xml"/>
+</source_factory>
