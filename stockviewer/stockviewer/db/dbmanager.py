@@ -45,7 +45,7 @@ class dbmanager():
 				query = query + " and st.date >= '{begin}'"
 
 			if end:
-				query = query + " and st.date < '{end}'"
+				query = query + " and st.date <= '{end}'"
 
 			query = query + " order by st.date"
 

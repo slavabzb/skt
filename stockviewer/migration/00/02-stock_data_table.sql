@@ -5,5 +5,6 @@ create table STOCK_DATA(
 	`high` real not null,
 	`low` real not null,
 	`close` real not null,
-	`volume` integer not null
+	`volume` integer not null,
+	unique (`stock_id`, `date`)
 );
