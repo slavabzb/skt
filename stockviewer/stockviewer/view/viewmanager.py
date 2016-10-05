@@ -2,7 +2,8 @@ import logging
 
 from collections import namedtuple
 from time import localtime, struct_time, mktime, time
-from datetime import datetime, timedelta
+from datetime import datetime
+from utils import make_timedelta
 
 from source import source_factory
 
@@ -43,15 +44,22 @@ class viewmanager():
 		for item in stock_info:
 			print datetime.strftime(item['Date'], self.__date_input_format)
 
+		additional = []
+
 		print 'missed'
 		for item in missed:
 			print datetime.strftime(item[0], self.__date_input_format), datetime.strftime(item[1], self.__date_input_format)
+			local = self.__sources[self.__onmiss_source].get(symbol, item[0], item[1])
+			for data in local:
+				additional.append(data)
+
+		
 
 	def __get_missed(self, stock_info, dbegin, dend):
 		missed = []
 
 		index = 0
-		timestep = self.__make_timedelta('date_step')
+		timestep = make_timedelta(self.__config.find('date_step'))
 		ibegin = dbegin
 		iend = ibegin + timestep
 		while iend < dend:
@@ -83,7 +91,7 @@ class viewmanager():
 			if stock_info:
 				dend = stock_info[-1]['Date']
 			else:
-				dend = datetime.today() + self.__make_timedelta('default_view_window')
+				dend = datetime.today() + make_timedelta(self.__config.find('default_view_window'))
 				dend = dend.timetuple()
 
 		if dend <= dbegin:
@@ -92,11 +100,3 @@ class viewmanager():
 		logging.debug('View window is {} - {}'.format(datetime.strftime(dbegin, self.__date_input_format), datetime.strftime(dend, self.__date_input_format)))
 
 		return dbegin, dend
-
-	def __make_timedelta(self, path):
-		delta = {}
-
-		for node in self.__config.find(path):
-			delta.update({node.tag: int(node.text)})
-
-		return timedelta(**delta)

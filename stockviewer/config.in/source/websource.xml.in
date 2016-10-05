@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <source name="web" xmlns:xi="http://www.w3.org/2001/XInclude">
-	<url>http://www.google.com/finance/historical?q={symbol}&amp;startdate={begin}&amp;enddate={end}&amp;output=csv"</url>
+	<url>http://www.google.com/finance/historical?q={symbol}&amp;startdate={begin}&amp;enddate={end}&amp;output=csv</url>
+	<date_request_format>%b %d, %Y</date_request_format>
+	<date_output_format>%d-%b-%y</date_output_format>
 	<xi:include href="@CONFIG/parts/fields.xml"/>
+	<xi:include href="@CONFIG/parts/default_view_window.xml"/>
 </source>

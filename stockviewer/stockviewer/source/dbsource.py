@@ -1,15 +1,13 @@
 import logging
 
 from db.provider import provider_factory
+from utils import make_fields
 
 class dbsource():
 	def __init__(self, config):
 		logging.debug('Db source init: config {}'.format(config))
 		self.__config = config
-
-		self.__fields = {}
-		for node in self.__config.find('fields'):
-			self.__fields.update({node.get('alias'): node.text})
+		self.__fields = make_fields(self.__config.find('fields'))
 
 		factory = provider_factory(self.__config.find('provider_factory'))
 		self.__provider = factory.create_provider(self.__config.find('provider').text)

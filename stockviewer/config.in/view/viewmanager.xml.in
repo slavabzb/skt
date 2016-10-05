@@ -5,12 +5,10 @@
 	<date_step>
 		<days>1</days>
 	</date_step>
-	<default_view_window>
-		<days>365</days>
-	</default_view_window>
 	<sources>
 		<source using="onview">database</source>
 		<source using="onmiss">web</source>
 	</sources>
 	<xi:include href="@CONFIG/source/factory.xml"/>
+	<xi:include href="@CONFIG/parts/default_view_window.xml"/>
 </viewmanager>
