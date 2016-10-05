@@ -3,21 +3,25 @@ import logging
 from collections import namedtuple
 from time import localtime, struct_time, mktime, time
 from datetime import datetime, timedelta
-from db import dbmanager
-from getter import getter
+
+from source import source_factory
 
 class viewmanager():
 	def __init__(self, config):
 		logging.debug('View manager init: config {}'.format(config))
 		self.__config = config
-		self.__db = dbmanager(self.__config.find('dbmanager'))
-		self.__getter = getter(self.__config.find('getter'))
 		self.__date_input_format = self.__config.find('date_input_format').text
 		self.__date_view_format = self.__config.find('date_view_format').text
-
-	def close(self):
-		logging.debug('View manager close')
-		self.__db.close()
+		self.__sources = {}
+		self.__onview_source = None
+		self.__onmiss_source = None
+		factory = source_factory(self.__config.find('source_factory'))
+		for node in self.__config.find('sources').iter('source'):
+			self.__sources.update({node.text: factory.create_source(node.text)})
+			if node.get('using') == 'onview':
+				self.__onview_source = node.text
+			elif node.get('using') == 'onmiss':
+				self.__onmiss_source = node.text
 
 	def view(self, symbol, begin = None, end = None):
 		logging.debug('View manager view: symbol `{symbol}`, begin `{begin}`, end `{end}`'.format(symbol=symbol, begin=begin, end=end))
@@ -31,7 +35,7 @@ class viewmanager():
 		except ValueError:
 			raise Exception("Dates don't match the format `{}`".format(self.__date_input_format))
 
-		stock_info = self.__db.get_stock_info(symbol, begin, end)
+		stock_info = self.__sources[self.__onview_source].get(symbol, begin, end)
 		dbegin, dend = self.__correct_dates(stock_info, begin, end)
 		missed = self.__get_missed(stock_info, dbegin, dend)
 
@@ -85,7 +89,7 @@ class viewmanager():
 		if dend <= dbegin:
 			raise Exception('The end `{}` of the period is less or equal to begin `{}`'.format(datetime.strftime(dend, self.__date_view_format), datetime.strftime(dbegin, self.__date_view_format)))
 
-		logging.debug('View period is {} - {}'.format(datetime.strftime(dbegin, self.__date_input_format), datetime.strftime(dend, self.__date_input_format)))
+		logging.debug('View window is {} - {}'.format(datetime.strftime(dbegin, self.__date_input_format), datetime.strftime(dend, self.__date_input_format)))
 
 		return dbegin, dend
 

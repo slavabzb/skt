@@ -8,6 +8,9 @@
 	<default_view_window>
 		<days>365</days>
 	</default_view_window>
-	<xi:include href="@CONFIG/db/dbmanager.xml"/>
-	<xi:include href="@CONFIG/getter/getter.xml"/>
+	<sources>
+		<source using="onview">database</source>
+		<source using="onmiss">web</source>
+	</sources>
+	<xi:include href="@CONFIG/source/factory.xml"/>
 </viewmanager>

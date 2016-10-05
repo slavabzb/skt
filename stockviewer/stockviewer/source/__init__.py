@@ -1,2 +1,1 @@
-from getter import getter
-from getter_factory import getter_factory
+from source_factory import source_factory

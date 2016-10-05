@@ -1,17 +1,21 @@
 import logging
 
-from urlgetter import urlgetter
+from dbsource import dbsource
+from websource import websource
 
-class getter_factory():
+class source_factory():
 	def __init__(self, config):
-		logging.debug('Getter factory init: config {}'.format(config))
+		logging.debug('Source factory init: config {}'.format(config))
 		self.__config = config
 
-	def create_getter(self, requested_name):
-		for node in self.__config.iter('getter'):
-			if requested_name == node.get('name'):
-				return urlgetter(node)
+	def create_source(self, requested_name):
+		node = self.__config.find("./source[@name='{}']".format(requested_name))
 
-		logging.warning("No '{}' getter found".format(requested_name))
+		if requested_name == 'database':
+			return dbsource(node)
+		elif requested_name == 'web':
+			return websource(node)
+
+		logging.warning("No '{}' source found".format(requested_name))
 
 		return None

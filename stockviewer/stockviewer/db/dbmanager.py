@@ -9,68 +9,12 @@ class dbmanager():
 		logging.debug('Db manager init: config {}'.format(config))
 		self.__config = config
 
-		self.__fields = {}
-		for node in self.__config.find('fields'):
-			self.__fields.update({node.get('alias'): node.text})
-
 		factory = provider_factory(self.__config.find('provider_factory'))
-		
 		self.__provider = factory.create_provider(self.__config.find('provider').text)
-		self.__provider.connect()
-
-	def close(self):
-		logging.debug('Db manager close')
-		self.__provider.close()
-
-	def get_stock_info(self, symbol, begin = None, end = None):
-		logging.debug('Db manager get stock info: symbol `{symbol}`, begin `{begin}`, end `{end}`'.format(symbol=symbol, begin=begin, end=end))
-		res = []
-
-		try:
-			query = (
-				"select "
-					"st.date,"
-					"st.open,"
-					"st.high,"
-					"st.low,"
-					"st.close,"
-					"st.volume"
-				" from "
-					"STOCK s join STOCK_DATA st using(stock_id)"
-				" where "
-					"s.name = '{symbol}'"
-			)
-
-			if begin:
-				query = query + " and st.date >= '{begin}'"
-
-			if end:
-				query = query + " and st.date <= '{end}'"
-
-			query = query + " order by st.date"
-
-			res = self.__provider.execute(query, symbol=symbol, begin=begin, end=end, sqlitedatefmtids=[0])
-		except Exception as e:
-			logging.warning(e)
-
-		stock_info = []
-
-		for row in res:
-			info = {
-				self.__fields['date']: row[0],
-				self.__fields['open']: row[1],
-				self.__fields['high']: row[2],
-				self.__fields['low']: row[3],
-				self.__fields['close']: row[4],
-				self.__fields['volume']: row[5],
-			}
-
-			stock_info.append(info)
-
-		return stock_info
 
 	def make_migration(self):
 		logging.debug('Db manager make migration')
+		self.__provider.connect()
 		current_version = 0
 
 		try:
@@ -117,3 +61,5 @@ class dbmanager():
 				except Exception as e:
 					self.__provider.execute('update MIGRATION_VERSION set `dirty` = 1')
 					raise e
+
+		self.__provider.close()

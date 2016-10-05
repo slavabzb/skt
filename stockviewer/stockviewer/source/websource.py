@@ -2,9 +2,9 @@ import logging
 
 from urllib2 import urlopen
 
-class urlgetter():
+class websource():
 	def __init__(self, config):
-		logging.debug('Url getter init: config {}'.format(config))
+		logging.debug('Web source init: config {}'.format(config))
 		self.__config = config
 		self.__url = self.__config.find('url').text
 

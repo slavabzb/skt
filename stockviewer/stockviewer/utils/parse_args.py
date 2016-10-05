@@ -14,8 +14,13 @@ def parse_args():
 
 	view_parser = subparsers.add_parser('view', help='stock view commands')
 	view_parser.add_argument('symbol', help='stock symbol')
-	view_parser.add_argument('--begin', '-b', help='begin of the period (inclusive)')
-	view_parser.add_argument('--end', '-e', help='end of the period (exclusive)')
+	view_parser.add_argument('--begin', '-b', help='begin of the period')
+	view_parser.add_argument('--end', '-e', help='end of the period')
+
+	view_source_group = view_parser.add_argument_group('source', 'view source settings')
+	view_source_group.add_argument('--onview-source', '-vs', default='database', help='source used for data viewing (default: database)')
+	view_source_group.add_argument('--onmiss-source', '-ms', default='web', help='source used if search is incomplete (default: web)')
+
 	view_parser.set_defaults(func=viewmain)
 
 	return parser.parse_args()
