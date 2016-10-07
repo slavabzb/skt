@@ -52,7 +52,4 @@ class websource():
 
 			stock_info.append(info)
 
-		for row in stock_info:
-			print row
-
 		return stock_info

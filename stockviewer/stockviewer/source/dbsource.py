@@ -61,3 +61,65 @@ class dbsource():
 			stock_info.append(info)
 
 		return stock_info
+
+	def store(self, symbol, stock_data):
+		try:
+			self.__provider.connect()
+			
+			query = (
+				"select "
+					"stock_id"
+				" from "
+					"STOCK"
+				" where "
+					"name = '{symbol}'"
+			)
+
+			res = self.__provider.execute(query, symbol=symbol)
+
+			stock_id = None
+
+			if res:
+				stock_id = res[0][0]
+			else:
+				query = (
+					"insert into "
+						"STOCK"
+					" values (null, '{symbol}')"
+				)
+
+				self.__provider.execute(query, symbol=symbol)
+
+				query = (
+					"select "
+						"stock_id"
+					" from "
+						"STOCK"
+					" where "
+						"name = '{symbol}'"
+				)
+
+				res = self.__provider.execute(query, symbol=symbol)
+
+				stock_id = res[0][0]
+
+			query = (
+				"insert into "
+					"STOCK_DATA"
+				" values ({stock_id},'{date}',{open},{high},{low},{close},{volume})"
+			)
+
+			self.__provider.execute(query,
+				stock_id=stock_id,
+				date=stock_data[self.__fields['date']],
+				open=stock_data[self.__fields['open']],
+				high=stock_data[self.__fields['high']],
+				low=stock_data[self.__fields['low']],
+				close=stock_data[self.__fields['close']],
+				volume=stock_data[self.__fields['volume']]
+			)
+
+			self.__provider.close()
+		except Exception as e:
+			logging.warning(e)
+

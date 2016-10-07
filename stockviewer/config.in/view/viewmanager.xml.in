@@ -10,5 +10,6 @@
 		<source using="onmiss">web</source>
 	</sources>
 	<xi:include href="@CONFIG/source/factory.xml"/>
+	<xi:include href="@CONFIG/parts/fields.xml"/>
 	<xi:include href="@CONFIG/parts/default_view_window.xml"/>
 </viewmanager>
