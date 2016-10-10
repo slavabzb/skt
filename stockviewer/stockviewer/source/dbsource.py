@@ -1,7 +1,7 @@
 import logging
 
-from db.provider import provider_factory
-from utils import make_fields
+from stockviewer.db.provider import provider_factory
+from stockviewer.utils import make_fields
 
 class dbsource():
 	def __init__(self, config):

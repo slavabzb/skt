@@ -3,7 +3,8 @@ import csv
 
 from urllib2 import urlopen, quote
 from datetime import datetime
-from utils import make_timedelta, make_fields
+
+from stockviewer.utils import make_timedelta, make_fields
 
 class websource():
 	def __init__(self, config):
@@ -43,11 +44,11 @@ class websource():
 
 			info = {
 				self.__fields['date']: datetime.strptime(row[0], self.__date_output_format),
-				self.__fields['open']: row[1],
-				self.__fields['high']: row[2],
-				self.__fields['low']: row[3],
-				self.__fields['close']: row[4],
-				self.__fields['volume']: row[5],
+				self.__fields['open']: float(row[1]),
+				self.__fields['high']: float(row[2]),
+				self.__fields['low']: float(row[3]),
+				self.__fields['close']: float(row[4]),
+				self.__fields['volume']: int(row[5]),
 			}
 
 			stock_info.append(info)

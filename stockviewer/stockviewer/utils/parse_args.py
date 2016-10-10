@@ -1,7 +1,7 @@
 from argparse import ArgumentParser
 
-from db import main as dbmain
-from view import main as viewmain
+from stockviewer.db import main as dbmain
+from stockviewer.view import main as viewmain
 
 def parse_args():
 	parser = ArgumentParser()

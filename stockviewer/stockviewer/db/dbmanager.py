@@ -1,6 +1,7 @@
 import os
 import logging
-import settings
+
+import stockviewer.settings
 
 from provider import provider_factory
 

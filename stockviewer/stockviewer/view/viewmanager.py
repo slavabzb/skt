@@ -1,11 +1,10 @@
 import logging
 
-from collections import namedtuple
 from time import localtime, struct_time, mktime, time
 from datetime import datetime
-from utils import make_timedelta, make_fields
 
-from source import source_factory
+from stockviewer.utils import make_timedelta, make_fields
+from stockviewer.source import source_factory
 
 class viewmanager():
 	def __init__(self, config):
@@ -46,10 +45,23 @@ class viewmanager():
 		for item in missed:
 			local = self.__sources[self.__onmiss_source].get(symbol, item[0], item[1])
 			for data in local:
-				additional.append(data)
+				if data not in stock_data:
+					additional.append(data)
 
 		for data in additional:
 			self.__sources[self.__onview_source].store(symbol, data)
+
+		result = []
+
+		for item in stock_data:
+			item.update({'cache': 1})
+			item["Date"] = datetime.strftime(item["Date"], self.__date_view_format)
+			result.append(item)
+
+		for item in additional:
+			item.update({'cache': 0})
+			item["Date"] = datetime.strftime(item["Date"], self.__date_view_format)
+			result.append(item)
 
 		stock_data = self.__sources[self.__onview_source].get(symbol, begin, end)
 
@@ -59,6 +71,8 @@ class viewmanager():
 		for data in stock_data:
 			data["Date"] = datetime.strftime(data["Date"], self.__date_view_format)
 			print "{Date:<15}{Open:<10}{High:<10}{Low:<10}{Close:<10}{Volume:<10}".format(**data)
+
+		return sorted(result, key=lambda item: item['Date'])
 
 	def __get_missed(self, stock_data, dbegin, dend):
 		missed = []
