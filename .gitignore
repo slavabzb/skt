@@ -95,3 +95,10 @@ stockviewer/config/
 stockviewer/private/
 stockviewer/db/
 
+# lab6
+lab6/lab/game/Backup/
+lab6/lab/game/obj/
+lab6/lab/game/bin/
+lab6/lab/game/_UpgradeReport_Files/
+lab6/lab/game/UpgradeLog.XML
+
