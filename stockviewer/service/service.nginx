@@ -1,0 +1,8 @@
+server {
+	listen 9999;
+
+	location / {
+		uwsgi_pass unix:/run/uwsgi/app/service/socket;
+		include /etc/nginx/uwsgi_params;
+	}
+}

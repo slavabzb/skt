@@ -1,0 +1,108 @@
+ <!DOCTYPE html>
+<html>
+
+<head>
+<title>Stock Viewer</title>
+</head>
+
+<link href="https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css" rel="stylesheet">
+
+<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+<script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+
+<script>
+$(function() {
+	$('#begin').datepicker({
+		dateFormat: "dd-mm-yy"
+	});
+
+	$('#end').datepicker({
+		dateFormat: "dd-mm-yy"
+	});
+
+	$('#stock').hide();
+});
+
+function update() {
+	$.get('http://127.0.0.1:5000/view', {
+		'symbol': $('#symbol').val(),
+		'begin': $('#begin').val(),
+		'end': $('#end').val()
+	},
+	function (data) {
+		$("#stock").find("tr:gt(0)").remove();
+		$('#stock').show();
+		$.each(data, function (id, val) {
+			console.log(id, val)
+			var cls = 'miss';
+			if (val.cache) {
+				cls = 'cache';
+			};
+			$('#stock').find('tbody')
+				.append($('<tr align="right" class="' + cls + '">')
+					.append($('<td>').text(val.Date))
+					.append($('<td>').text(val.Open))
+					.append($('<td>').text(val.Close))
+					.append($('<td>').text(val.Low))
+					.append($('<td>').text(val.High))
+					.append($('<td>').text(val.Volume))
+			);
+		});
+	});
+}
+</script>
+
+<style type="text/css">
+html {
+	background: url( {{url_for('static', filename='bg.png')}} ) no-repeat center center fixed;
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	-o-background-size: cover;
+	background-size: cover;
+}
+
+h1 {
+	color: orangered;
+}
+
+body {
+	color: saddlebrown;
+}
+
+.cache {
+	color: greenyellow
+}
+
+.miss {
+	color: orangered;
+}
+</style>
+
+<body>
+
+<h1 align="center">Welcome to Stock Viewer</h1>
+
+<form>
+	<table align="center">
+		<tr><td><input type="text" placeholder="Enter stock symbol" id="symbol" pattern="^[a-z0-9]+$" title="Name in lowercase" required="required"></td></tr>
+		<tr><td><input type="text" placeholder="Enter begin date" id="begin" pattern="^[0-9]{2}-[0-9]{2}-[0-9]{4}$" title="DD-MM-YYYY" required="required"></td></tr>
+		<tr><td><input type="text" placeholder="Enter end date" id="end" pattern="^[0-9]{2}-[0-9]{2}-[0-9]{4}$" title="DD-MM-YYYY" required="required"></td></tr>
+		<tr><td align="center"><input type="submit" value="View" onclick="update()" align="center" /></td></tr>
+	</table>
+</form>
+
+<br>
+
+<table id="stock" align="center" cellspacing="25">
+	<tr align="left">
+		<th>Date</th>
+		<th>Open</th>
+		<th>Close</th>
+		<th>Low</th>
+		<th>High</th>
+		<th>Volume</th>
+	</tr>
+</table>
+
+</body>
+</html>
