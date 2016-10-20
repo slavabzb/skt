@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type='text/xsl' href='_UpgradeReport_Files/UpgradeReport.xslt'?><UpgradeLog>
+<Properties><Property Name="Solution" Value="game1">
+</Property><Property Name="Файл решения" Value="F:\ЗИвПС\Начало\lab2\game1\game1.sln">
+</Property><Property Name="Date" Value="Thursday, October 20, 2016">
+</Property><Property Name="Time" Value="22:29 PM">
+</Property></Properties><Event ErrorLevel="0" Project="" Source="game1.sln" Description="Успешно создана резервная копия файла F:\ЗИвПС\Начало\lab2\game1\Backup\game1.sln">
+</Event><Event ErrorLevel="0" Project="game1" Source="game1.csproj" Description="Успешно создана резервная копия файла проекта: F:\ЗИвПС\Начало\lab2\game1\Backup\game1.csproj">
+</Event><Event ErrorLevel="0" Project="game1" Source="Form1.cs" Description="Успешно создана резервная копия файла F:\ЗИвПС\Начало\lab2\game1\Backup\Form1.cs">
+</Event><Event ErrorLevel="0" Project="game1" Source="Program.cs" Description="Успешно создана резервная копия файла F:\ЗИвПС\Начало\lab2\game1\Backup\Program.cs">
+</Event><Event ErrorLevel="0" Project="game1" Source="Properties\Resources.cs" Description="Успешно создана резервная копия файла F:\ЗИвПС\Начало\lab2\game1\Backup\Properties\Resources.cs">
+</Event><Event ErrorLevel="0" Project="game1" Source="Properties\Settings.cs" Description="Успешно создана резервная копия файла F:\ЗИвПС\Начало\lab2\game1\Backup\Properties\Settings.cs">
+</Event><Event ErrorLevel="0" Project="game1" Source="AssemblyInfo.cs" Description="Успешно создана резервная копия файла F:\ЗИвПС\Начало\lab2\game1\Backup\AssemblyInfo.cs">
+</Event><Event ErrorLevel="0" Project="game1" Source="Close.png" Description="Успешно создана резервная копия файла F:\ЗИвПС\Начало\lab2\game1\Backup\Close.png">
+</Event><Event ErrorLevel="0" Project="game1" Source="Fon.png" Description="Успешно создана резервная копия файла F:\ЗИвПС\Начало\lab2\game1\Backup\Fon.png">
+</Event><Event ErrorLevel="0" Project="game1" Source="fonLabel.png" Description="Успешно создана резервная копия файла F:\ЗИвПС\Начало\lab2\game1\Backup\fonLabel.png">
+</Event><Event ErrorLevel="0" Project="game1" Source="FonSetka.png" Description="Успешно создана резервная копия файла F:\ЗИвПС\Начало\lab2\game1\Backup\FonSetka.png">
+</Event><Event ErrorLevel="0" Project="game1" Source="fonTimer.png" Description="Успешно создана резервная копия файла F:\ЗИвПС\Начало\lab2\game1\Backup\fonTimer.png">
+</Event><Event ErrorLevel="0" Project="game1" Source="Form1.resx" Description="Успешно создана резервная копия файла F:\ЗИвПС\Начало\lab2\game1\Backup\Form1.resx">
+</Event><Event ErrorLevel="0" Project="game1" Source="Krest.png" Description="Успешно создана резервная копия файла F:\ЗИвПС\Начало\lab2\game1\Backup\Krest.png">
+</Event><Event ErrorLevel="0" Project="game1" Source="Line45.png" Description="Успешно создана резервная копия файла F:\ЗИвПС\Начало\lab2\game1\Backup\Line45.png">
+</Event><Event ErrorLevel="0" Project="game1" Source="Line-45.png" Description="Успешно создана резервная копия файла F:\ЗИвПС\Начало\lab2\game1\Backup\Line-45.png">
+</Event><Event ErrorLevel="0" Project="game1" Source="LineGor.png" Description="Успешно создана резервная копия файла F:\ЗИвПС\Начало\lab2\game1\Backup\LineGor.png">
+</Event><Event ErrorLevel="0" Project="game1" Source="LineVer.png" Description="Успешно создана резервная копия файла F:\ЗИвПС\Начало\lab2\game1\Backup\LineVer.png">
+</Event><Event ErrorLevel="0" Project="game1" Source="Nol.png" Description="Успешно создана резервная копия файла F:\ЗИвПС\Начало\lab2\game1\Backup\Nol.png">
+</Event><Event ErrorLevel="0" Project="game1" Source="Properties\Resources.resx" Description="Успешно создана резервная копия файла F:\ЗИвПС\Начало\lab2\game1\Backup\Properties\Resources.resx">
+</Event><Event ErrorLevel="0" Project="game1" Source="Setca.png" Description="Успешно создана резервная копия файла F:\ЗИвПС\Начало\lab2\game1\Backup\Setca.png">
+</Event><Event ErrorLevel="0" Project="game1" Source="Svernut.png" Description="Успешно создана резервная копия файла F:\ЗИвПС\Начало\lab2\game1\Backup\Svernut.png">
+</Event><Event ErrorLevel="0" Project="game1" Source="game1.csproj" Description="Проект успешно преобразован">
+</Event><Event ErrorLevel="3" Project="game1" Source="game1.csproj" Description="Converted">
+</Event><Event ErrorLevel="0" Project="" Source="game1.sln" Description="Преобразование решения успешно завершено">
+</Event><Event ErrorLevel="3" Project="" Source="game1.sln" Description="Converted">
+</Event><Event ErrorLevel="0" Project="game1" Source="game1.csproj" Description="Сканирование завершено: обновление для файлов проекта не требуется.">
+</Event></UpgradeLog>

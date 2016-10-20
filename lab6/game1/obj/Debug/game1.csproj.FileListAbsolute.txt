@@ -1,0 +1,7 @@
+F:\ЗИвПС\Начало\lab2\game1\bin\Debug\WindowsFormsApplication1.exe
+F:\ЗИвПС\Начало\lab2\game1\bin\Debug\WindowsFormsApplication1.pdb
+F:\ЗИвПС\Начало\lab2\game1\obj\Debug\WindowsFormsApplication1.Form1.resources
+F:\ЗИвПС\Начало\lab2\game1\obj\Debug\WindowsFormsApplication1.Properties.Resources.resources
+F:\ЗИвПС\Начало\lab2\game1\obj\Debug\game1.csproj.GenerateResource.Cache
+F:\ЗИвПС\Начало\lab2\game1\obj\Debug\WindowsFormsApplication1.exe
+F:\ЗИвПС\Начало\lab2\game1\obj\Debug\WindowsFormsApplication1.pdb

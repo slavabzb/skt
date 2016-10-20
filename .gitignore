@@ -102,3 +102,10 @@ lab6/lab/game/bin/
 lab6/lab/game/_UpgradeReport_Files/
 lab6/lab/game/UpgradeLog.XML
 
+# lab7
+lab7/lab/game/Backup/
+lab7/lab/game/obj/
+lab7/lab/game/bin/
+lab7/lab/game/_UpgradeReport_Files/
+lab7/lab/game/UpgradeLog.XML
+
