@@ -30,7 +30,7 @@ class dbmanager():
 
 		logging.debug('Current database version is `{}`'.format(current_version))
 
-		for dirpath, dirnames, filenames in os.walk(settings.dirs['migration']):
+		for dirpath, dirnames, filenames in os.walk(stockviewer.settings.dirs['migration']):
 			for new_version in sorted(dirnames):
 				files = []
 
